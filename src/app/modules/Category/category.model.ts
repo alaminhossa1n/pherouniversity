@@ -5,6 +5,11 @@ const categorySchema = new Schema<TCategory>({
   name: {
     type: String,
   },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
+  },
 });
 
 const CategoryModel = model<TCategory>("category", categorySchema);
