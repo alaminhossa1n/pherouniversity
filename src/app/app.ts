@@ -14,7 +14,7 @@ app.use(cors());
 app.use("/api/categories", categoryRoutes);
 app.use("/api", courseRoutes);
 app.use("/api/reviews", reviewRoutes);
-app.use("/auth", userRoutes);
+app.use("/api", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("YES Its Working.....!");
