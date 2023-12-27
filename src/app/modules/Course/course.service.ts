@@ -3,7 +3,7 @@ import { TCourse, TQueryParams } from "./course.interface";
 import CourseModel from "./course.model";
 
 const createCourseInToDB = async (payload: TCourse) => {
-  const result = await CourseModel.create(payload);
+  const result = (await CourseModel.create(payload)).populate("createdBy");
   return result;
 };
 

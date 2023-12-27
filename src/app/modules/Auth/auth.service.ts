@@ -44,7 +44,7 @@ const changePassword = async (
   currentUser: JwtPayload,
   payload: { currentPassword: string; newPassword: string }
 ) => {
-  const isUserExist = await UserModel.findOne({ _id: currentUser?._id });
+  const isUserExist = await UserModel.findOne({ _id: currentUser?._id }).select('+password');
 
   if (!isUserExist) {
     throw new AppError(404, "User does not exit");
@@ -59,7 +59,7 @@ const changePassword = async (
     throw new AppError(404, "Password does not matched");
   }
 
-  const lastThreePassword: string[] = isUserExist?.lastTwoPassword || [];
+  const lastThreePassword: string[] = isUserExist?.lastThreePassword || [];
 
   if (lastThreePassword?.includes(payload.newPassword)) {
     throw new AppError(
@@ -83,7 +83,7 @@ const changePassword = async (
     },
     {
       password: hashedPassword,
-      lastTwoPassword: lastThreePassword,
+      lastThreePassword: lastThreePassword,
       passwordChangedAt: new Date(),
     },
     {

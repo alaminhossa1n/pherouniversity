@@ -26,7 +26,7 @@ const changePassword = async (
     const result = await AuthServices.changePassword(currentUser, req.body);
     res.status(200).json({
       success: true,
-      statusCode: 201,
+      statusCode: 200,
       message: "Password changed successfully",
       data: result,
     });
