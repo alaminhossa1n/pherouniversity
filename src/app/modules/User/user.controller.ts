@@ -4,7 +4,7 @@ import { UserServices } from "./user.service";
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await UserServices.createUserInToDB(req.body);
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       statusCode: 201,
       message: "User registered successfully",
