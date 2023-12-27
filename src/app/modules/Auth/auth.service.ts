@@ -3,7 +3,7 @@ import AppError from "../../errors/AppError";
 import UserModel from "../User/user.model";
 import { TLoginUser } from "./auth.interface";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 const loginUser = async (payload: TLoginUser) => {
   const isUserExist = await UserModel.findOne({ username: payload?.username });
@@ -24,7 +24,7 @@ const loginUser = async (payload: TLoginUser) => {
   };
 
   const accessToken = jwt.sign(jwtPayload, config.jwt_secret as string, {
-    expiresIn: '10d',
+    expiresIn: "10d",
   });
 
   console.log(accessToken);
@@ -40,6 +40,29 @@ const loginUser = async (payload: TLoginUser) => {
   };
 };
 
+//change password
+const changePassword = async (
+  currentUser: JwtPayload,
+  payload: { currentPassword: string; newPassword: string }
+) => {
+  const isUserExist = await UserModel.findOne({ _id: currentUser?._id });
+
+  if (!isUserExist) {
+    throw new AppError(404, "User does not exit");
+  }
+
+  const isPasswordMatched = await bcrypt.compare(
+    payload?.currentPassword,
+    isUserExist?.password
+  );
+
+  if (!isPasswordMatched) {
+    throw new AppError(404, "Password does not matched");
+  }
+  
+};
+
 export const AuthServices = {
   loginUser,
+  changePassword,
 };

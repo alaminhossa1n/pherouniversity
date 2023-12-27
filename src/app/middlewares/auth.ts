@@ -3,7 +3,7 @@ import AppError from "../errors/AppError";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../config";
 
-const auth = (...roles) => {
+const auth = (...roles: any) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization;
 
