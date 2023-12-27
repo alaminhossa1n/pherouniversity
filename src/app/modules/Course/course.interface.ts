@@ -18,7 +18,7 @@ export type TCourse = {
     level: string;
     description: string;
   };
-  createdBy: Types.ObjectId;
+  createdBy?: Types.ObjectId;
 };
 
 export type TPagination = {

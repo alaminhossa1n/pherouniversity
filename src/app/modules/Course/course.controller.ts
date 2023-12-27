@@ -7,6 +7,8 @@ const createCourse = async (
   next: NextFunction
 ) => {
   try {
+    req.body.createdBy = req.user._id;
+
     const result = await courseServices.createCourseInToDB(req.body);
 
     res.status(201).json({

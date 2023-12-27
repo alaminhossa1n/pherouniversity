@@ -29,7 +29,6 @@ const courseSchema = new Schema<TCourse>(
     },
     createdBy: {
       type: Schema.Types.ObjectId,
-      required: true,
       ref: "User",
     },
   },

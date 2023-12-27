@@ -3,7 +3,7 @@ import { TCourse, TQueryParams } from "./course.interface";
 import CourseModel from "./course.model";
 
 const createCourseInToDB = async (payload: TCourse) => {
-  const result = (await CourseModel.create(payload)).populate("createdBy");
+  const result = (await CourseModel.create(payload));
   return result;
 };
 
@@ -121,7 +121,6 @@ const getBestCourseBasedOnReviewFromDB = async () => {
 
 // get course with filtered
 const getAllCoursesFromDB = async (queryParams: TQueryParams) => {
-  console.log({ queryParams });
 
   const {
     page = 1,
@@ -180,13 +179,11 @@ const getAllCoursesFromDB = async (queryParams: TQueryParams) => {
   if (sortBy) {
     sort[sortBy] = sortOrder === "desc" ? -1 : 1;
   }
-  console.log({ filter });
 
   const courses = await CourseModel.find(filter)
     .sort(sort)
     .skip(skip)
-    .limit(limit);
-
+    .limit(limit)
   return courses;
 };
 

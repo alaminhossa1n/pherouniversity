@@ -7,7 +7,10 @@ const createCategoryInToDB = async (payload: TCategory) => {
 };
 
 const getAllCategoriesFromDB = async () => {
-  const result = await CategoryModel.find();
+  const result = await CategoryModel.find().populate({
+    path: 'createdBy',
+    select: 'username email role'
+  });
   return result;
 };
 
