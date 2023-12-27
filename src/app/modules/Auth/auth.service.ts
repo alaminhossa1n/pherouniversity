@@ -4,6 +4,7 @@ import UserModel from "../User/user.model";
 import { TLoginUser } from "./auth.interface";
 import bcrypt from "bcrypt";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { comparePassword, makeHashed } from "./auth.const";
 
 const loginUser = async (payload: TLoginUser) => {
   const isUserExist = await UserModel.findOne({ username: payload?.username });
@@ -27,7 +28,6 @@ const loginUser = async (payload: TLoginUser) => {
     expiresIn: "10d",
   });
 
-  console.log(accessToken);
 
   return {
     user: {
@@ -51,7 +51,7 @@ const changePassword = async (
     throw new AppError(404, "User does not exit");
   }
 
-  const isPasswordMatched = await bcrypt.compare(
+  const isPasswordMatched = await comparePassword(
     payload?.currentPassword,
     isUserExist?.password
   );
@@ -59,7 +59,45 @@ const changePassword = async (
   if (!isPasswordMatched) {
     throw new AppError(404, "Password does not matched");
   }
-  
+
+  const lastTwoPassword: string[] | undefined = isUserExist?.lastTwoPassword;
+
+  const checkCurrentAndNew = await comparePassword(
+    payload.newPassword,
+    isUserExist?.password
+  );
+
+  if (checkCurrentAndNew || lastTwoPassword?.includes(payload.newPassword)) {
+    throw new AppError(
+      400,
+      `Password change failed. Ensure the new password is unique and not among the last 2 used (last used on ${isUserExist?.passwordChangedAt}).`
+    );
+  }
+
+  const hashedPassword = await makeHashed(payload.newPassword);
+
+  lastTwoPassword.unshift(payload.newPassword);
+
+  if (lastTwoPassword.length > 2) {
+    lastTwoPassword.pop();
+  }
+
+  const result = await UserModel.findOneAndUpdate(
+    {
+      username: isUserExist?.username,
+      role: isUserExist?.role,
+    },
+    {
+      password: hashedPassword,
+      lastTwoPassword: lastTwoPassword,
+      passwordChangedAt: new Date(),
+    },
+    {
+      new: true,
+    }
+  );
+
+  return result;
 };
 
 export const AuthServices = {

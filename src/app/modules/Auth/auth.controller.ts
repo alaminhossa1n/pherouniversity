@@ -24,11 +24,11 @@ const changePassword = async (
     const currentUser = req.user;
 
     const result = await AuthServices.changePassword(currentUser, req.body);
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       statusCode: 201,
       message: "Password changed successfully",
-      data: null,
+      data: result,
     });
   } catch (err) {
     next(err);
