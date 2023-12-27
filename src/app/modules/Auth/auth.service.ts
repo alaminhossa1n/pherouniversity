@@ -28,7 +28,6 @@ const loginUser = async (payload: TLoginUser) => {
     expiresIn: "10d",
   });
 
-
   return {
     user: {
       _id: isUserExist?._id,
@@ -60,14 +59,9 @@ const changePassword = async (
     throw new AppError(404, "Password does not matched");
   }
 
-  const lastTwoPassword: string[] | undefined = isUserExist?.lastTwoPassword;
+  const lastThreePassword: string[] = isUserExist?.lastTwoPassword || [];
 
-  const checkCurrentAndNew = await comparePassword(
-    payload.newPassword,
-    isUserExist?.password
-  );
-
-  if (checkCurrentAndNew || lastTwoPassword?.includes(payload.newPassword)) {
+  if (lastThreePassword?.includes(payload.newPassword)) {
     throw new AppError(
       400,
       `Password change failed. Ensure the new password is unique and not among the last 2 used (last used on ${isUserExist?.passwordChangedAt}).`
@@ -76,10 +70,10 @@ const changePassword = async (
 
   const hashedPassword = await makeHashed(payload.newPassword);
 
-  lastTwoPassword.unshift(payload.newPassword);
+  lastThreePassword.unshift(payload.newPassword);
 
-  if (lastTwoPassword.length > 2) {
-    lastTwoPassword.pop();
+  if (lastThreePassword.length > 3) {
+    lastThreePassword.pop();
   }
 
   const result = await UserModel.findOneAndUpdate(
@@ -89,7 +83,7 @@ const changePassword = async (
     },
     {
       password: hashedPassword,
-      lastTwoPassword: lastTwoPassword,
+      lastTwoPassword: lastThreePassword,
       passwordChangedAt: new Date(),
     },
     {

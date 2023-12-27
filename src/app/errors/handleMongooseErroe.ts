@@ -6,9 +6,7 @@ const handleMongooseValidationError = (err: mongoose.Error.ValidationError) => {
       return val.message;
     })
     .join(", ");
-
-  const statusCode = 400;
-
+    
   return {
     message: "Validation Error",
     errorMessage,

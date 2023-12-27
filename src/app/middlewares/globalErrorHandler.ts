@@ -47,7 +47,6 @@ const globalErrorHandler = (
     errorMessage,
     errorDetails,
     stack: err?.stack,
-    test: err,
   });
 };
 
