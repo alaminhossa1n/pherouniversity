@@ -24,8 +24,10 @@ const loginUser = async (payload: TLoginUser) => {
   };
 
   const accessToken = jwt.sign(jwtPayload, config.jwt_secret as string, {
-    expiresIn: 60 * 60,
+    expiresIn: '10d',
   });
+
+  console.log(accessToken);
 
   return {
     user: {

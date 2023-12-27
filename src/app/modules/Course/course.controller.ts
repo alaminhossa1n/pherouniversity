@@ -8,6 +8,7 @@ const createCourse = async (
 ) => {
   try {
     const result = await courseServices.createCourseInToDB(req.body);
+
     res.status(201).json({
       success: true,
       statusCode: 201,
