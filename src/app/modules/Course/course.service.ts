@@ -75,7 +75,7 @@ const getCourseByIdWithReviewsFromDB = async (id: string) => {
         foreignField: "courseId",
         as: "reviews",
       },
-    },
+    }
   ]);
 
   return result;
