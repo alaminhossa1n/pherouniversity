@@ -8,13 +8,14 @@ const router = express.Router();
 
 router.post(
   "/course",
-  auth('admin'),
+  auth("admin"),
   validateRequest(courseValidations.createCourseValidationSchema),
   courseControllers.createCourse
 );
 
 router.put(
   "/courses/:courseId",
+  auth("admin"),
   validateRequest(courseValidations.updateCourseValidationSchema),
   courseControllers.updateCourse
 );
