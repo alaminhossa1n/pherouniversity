@@ -7,6 +7,8 @@ const createReview = async (
   next: NextFunction
 ) => {
   try {
+    req.body.createdBy = req.user._id;
+
     const result = await reviewServices.createReviewInToDB(req.body);
     res.status(201).json({
       success: true,

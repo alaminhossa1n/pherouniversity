@@ -7,6 +7,8 @@ const createCategory = async (
   next: NextFunction
 ) => {
   try {
+    req.body.createdBy = req.user._id;
+
     const result = await categoryServices.createCategoryInToDB(req.body);
 
     res.status(201).json({

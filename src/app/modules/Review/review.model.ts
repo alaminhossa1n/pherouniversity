@@ -14,7 +14,6 @@ const reviewSchema = new Schema<TReview>({
   },
   createdBy: {
     type: Schema.Types.ObjectId,
-    required: true,
     ref: "User",
   },
 });
