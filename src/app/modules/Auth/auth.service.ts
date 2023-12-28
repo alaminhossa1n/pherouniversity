@@ -7,7 +7,9 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { comparePassword, makeHashed } from "./auth.const";
 
 const loginUser = async (payload: TLoginUser) => {
-  const isUserExist = await UserModel.findOne({ username: payload?.username });
+  const isUserExist = await UserModel.findOne({
+    username: payload?.username,
+  }).select("+password");
 
   if (!isUserExist) {
     throw new AppError(404, "User does not exit");
@@ -17,6 +19,10 @@ const loginUser = async (payload: TLoginUser) => {
     payload?.password,
     isUserExist?.password
   );
+
+  if (!isPasswordMatched) {
+    throw new AppError(401, "Wrong Password!");
+  }
 
   const jwtPayload = {
     _id: isUserExist?._id,
@@ -44,7 +50,9 @@ const changePassword = async (
   currentUser: JwtPayload,
   payload: { currentPassword: string; newPassword: string }
 ) => {
-  const isUserExist = await UserModel.findOne({ _id: currentUser?._id }).select('+password');
+  const isUserExist = await UserModel.findOne({ _id: currentUser?._id }).select(
+    "+password +lastThreePassword"
+  );
 
   if (!isUserExist) {
     throw new AppError(404, "User does not exit");
@@ -59,7 +67,7 @@ const changePassword = async (
     throw new AppError(404, "Password does not matched");
   }
 
-  const lastThreePassword: string[] = isUserExist?.lastThreePassword || [];
+  const lastThreePassword = isUserExist?.lastThreePassword as string[];
 
   if (lastThreePassword?.includes(payload.newPassword)) {
     throw new AppError(

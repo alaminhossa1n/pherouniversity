@@ -19,6 +19,13 @@ const userSchema = new Schema<TUser>(
 
 userSchema.pre("save", async function (next) {
   const user = this;
+
+  if (!user.lastThreePassword) {
+    user.lastThreePassword = [];
+  }
+
+  user.lastThreePassword.unshift(this.password);
+
   user.password = await bcrypt.hash(this.password, Number(config.salt_rounds));
 
   next();
@@ -27,6 +34,7 @@ userSchema.pre("save", async function (next) {
 userSchema.post("save", function (next) {
   const doc = this;
   doc.password = "";
+  doc.lastThreePassword = [];
 });
 
 const UserModel = model<TUser>("User", userSchema);
