@@ -3,7 +3,7 @@ import { TCourse, TQueryParams } from "./course.interface";
 import CourseModel from "./course.model";
 
 const createCourseInToDB = async (payload: TCourse) => {
-  const result = (await CourseModel.create(payload));
+  const result = await CourseModel.create(payload);
   return result;
 };
 
@@ -67,18 +67,69 @@ const getCourseByIdWithReviewsFromDB = async (id: string) => {
   const objectId = new Types.ObjectId(id);
 
   const result = await CourseModel.aggregate([
-    { $match: { _id: objectId } },
+    {
+      $match: { _id: objectId },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "createdBy",
+      },
+    },
+    {
+      $addFields: {
+        createdBy: { $arrayElemAt: ["$createdBy", 0] },
+      },
+    },
+    {
+      $project: {
+        "createdBy.password": 0,
+        "createdBy.lastThreePassword": 0,
+      },
+    },
     {
       $lookup: {
         from: "reviews",
-        localField: "_id",
-        foreignField: "courseId",
+        let: { courseId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$courseId", "$$courseId"],
+              },
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              localField: "createdBy",
+              foreignField: "_id",
+              as: "createdBy",
+            },
+          },
+          {
+            $addFields: {
+              createdBy: { $arrayElemAt: ["$createdBy", 0] },
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              courseId: 1,
+              rating: 1,
+              review: 1,
+              createdBy: { _id: 1, username: 1, email: 1, role: 1 },
+            },
+          },
+        ],
         as: "reviews",
       },
-    }
+    },
   ]);
 
-  return result;
+  return result[0]; // Assuming there is only one course with the given ID
 };
 
 //Get the Best Course Based on Average Review (Rating)
@@ -121,7 +172,6 @@ const getBestCourseBasedOnReviewFromDB = async () => {
 
 // get course with filtered
 const getAllCoursesFromDB = async (queryParams: TQueryParams) => {
-
   const {
     page = 1,
     limit = 10,
@@ -183,7 +233,7 @@ const getAllCoursesFromDB = async (queryParams: TQueryParams) => {
   const courses = await CourseModel.find(filter)
     .sort(sort)
     .skip(skip)
-    .limit(limit)
+    .limit(limit);
   return courses;
 };
 
