@@ -154,6 +154,7 @@ const getBestCourseBasedOnReviewFromDB = async () => {
         totalReviews: { $sum: 1 },
       },
     },
+
     {
       $sort: { averageRating: -1 },
     },
@@ -161,8 +162,23 @@ const getBestCourseBasedOnReviewFromDB = async () => {
       $limit: 1,
     },
     {
+      $lookup: {
+        from: "users",
+        localField: "course.createdBy",
+        foreignField: "_id",
+        as: "course.createdBy",
+      },
+    },
+    {
+      $addFields: {
+        "course.createdBy": { $arrayElemAt: ["$course.createdBy", 0] },
+      },
+    },
+    {
       $project: {
         "course.reviews": 0,
+        "course.createdBy.password": 0, 
+        "course.createdBy.lastThreePassword": 0,
         _id: 0,
       },
     },
