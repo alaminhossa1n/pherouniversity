@@ -57,7 +57,7 @@ const updateCourseById = async (
     courseId,
     { $set: modifiedData },
     { new: true }
-  );
+  ).populate('createdBy');
   return result;
 };
 
