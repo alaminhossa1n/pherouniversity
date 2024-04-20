@@ -1,4 +1,4 @@
-# Assignment-4
+# Phero University
 
 Welcome to the Assignment-3 project! This project is a simple web application built with Node.js, Express, MongoDB, and TypeScript.
 
